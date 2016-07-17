@@ -40,6 +40,7 @@ public class Main {
             ServerConnector wsConnector = new ServerConnector(server);
             wsConnector.setHost("localhost");
             wsConnector.setPort(8081);
+            wsConnector.setIdleTimeout(1000*60*60*24L);
             server.addConnector(wsConnector);
 
             ServerConnector wssConnector = new ServerConnector(
@@ -53,7 +54,7 @@ public class Main {
 
             wssConnector.setHost("localhost");
             wssConnector.setPort(8082);
-
+            wssConnector.setIdleTimeout(1000*60*60*24L);
             server.addConnector(wssConnector);
 
             server.start();
@@ -65,9 +66,14 @@ public class Main {
         }
 
         while (true) {
-            if (System.in.available() > 0)
-                if (br.readLine().equals("exit"))
+            if (System.in.available() > 0){
+                String line = br.readLine();
+                if (line.equals("exit")) {
                     break;
+                } else {
+                    SocketHandler.getLastWebSocket().sendMessage(line);
+                }
+            }
         }
 
         try {

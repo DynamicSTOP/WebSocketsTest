@@ -17,6 +17,7 @@ public class TestWebSocket{
 
     @OnWebSocketConnect
     public void onConnect(Session session) {
+        SocketHandler.setLastWebSocket(this);
         System.out.println("Connect: " + session.getRemoteAddress().getAddress());
         try {
             this.session = session;
@@ -29,16 +30,21 @@ public class TestWebSocket{
     @OnWebSocketMessage
     public void onText(String message) {
         System.out.println("text: " + message);
-        try {
-            session.getRemote().sendString(message);
-        } catch (Exception e) {
-            e.printStackTrace();
-        }
     }
 
     @OnWebSocketClose
     public void onClose(int statusCode, String reason) {
         System.out.println("Close: statusCode=" + statusCode + ", reason=" + reason);
+        if(SocketHandler.getLastWebSocket()==this)
+            SocketHandler.setLastWebSocket(null);
+    }
+
+    public void sendMessage(String message){
+        try {
+            session.getRemote().sendString(message);
+        } catch (Exception e) {
+            e.printStackTrace();
+        }
     }
 
 }
